@@ -1,0 +1,45 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: aiops-backend
+  datasource:
+    url: jdbc:h2:mem:aiopsdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: aiops
+    password: aiops123
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+aiops:
+  jwt:
+    secret: AI0ps$3cret@K3y!Industrial0ps2026!LongSecretKeyForJWT256Bits
+    expiration-ms: 604800000  # 7 days
+    refresh-expiration-ms: 86400000  # 24 hours
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.aiops: DEBUG
+    org.springframework.security: INFO

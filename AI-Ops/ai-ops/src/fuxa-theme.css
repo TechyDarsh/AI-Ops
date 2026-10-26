@@ -1,0 +1,26 @@
+/* ==============================================================================
+   AI-OPS SCADA FLOW & GESTURE HUD UTILITY STYLES
+   Compatible with the classic legacy enterprise theme
+   ============================================================================== */
+
+@keyframes flowDash {
+  to { stroke-dashoffset: -40; }
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin-slow {
+  animation: spinSlow 8s linear infinite;
+}
+
+.fuxa-pipeline {
+  stroke-dasharray: 8 6;
+  animation: flowDash 1.2s linear infinite;
+}
+.fuxa-pipeline.crit {
+  stroke: #ef4444 !important;
+  animation: flowDash 0.5s linear infinite;
+}

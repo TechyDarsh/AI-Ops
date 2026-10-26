@@ -1,0 +1,45 @@
+services:
+  # 1. Spring Boot Backend (Port 8080)
+  ai-ops-backend:
+    build:
+      context: ./aiops-backend
+      dockerfile: Dockerfile
+    container_name: ai-ops-backend
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  # 2. AI-Ops React Web App (Port 5173)
+  ai-ops-frontend:
+    build:
+      context: ./ai-ops
+      dockerfile: Dockerfile
+    container_name: ai-ops-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8080/api
+    depends_on:
+      - ai-ops-backend
+    restart: unless-stopped
+
+  # 3. Mobile Web Simulation & Alert Console (Port 3000 & 6000)
+  ai-ops-mobile:
+    build:
+      context: ./ai-ops-mobile/www
+      dockerfile: Dockerfile
+    container_name: ai-ops-mobile
+    ports:
+      - "3000:3000"
+      - "6000:6000"
+    restart: unless-stopped
+
+  # 4. Edge Gateway WebSocket Relay (Port 8081)
+  edge-gateway:
+    build:
+      context: ./edge-gateway
+      dockerfile: Dockerfile
+    container_name: edge-gateway
+    ports:
+      - "8081:8081"
+    restart: unless-stopped

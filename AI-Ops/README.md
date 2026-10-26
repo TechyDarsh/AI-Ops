@@ -1,0 +1,144 @@
+<div align="center">
+
+# 🏭 AI-Ops: Next-Gen Industrial Intelligence & Automation Platform
+
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![React](https://img.shields.io/badge/React-19.x-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Three.js](https://img.shields.io/badge/Three.js-3D_Digital_Twin-black?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org/)
+[![Capacitor](https://img.shields.io/badge/Capacitor-Mobile_Hybrid-119EFF?style=for-the-badge&logo=capacitor&logoColor=white)](https://capacitorjs.com/)
+[![Docker](https://img.shields.io/badge/Docker-Compose_Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+
+*An end-to-end cyber-physical industrial platform integrating IoT edge sensors, microservices backend, interactive 3D digital twins, real-time analytics, and mobile companion alerts.*
+
+[Key Features](#-key-features) • [Architecture](#-system-architecture) • [Project Structure](#-project-structure) • [Quick Start](#-quick-start) • [Services & Ports](#-services--ports) • [3D Asset Notice](#-3d-model-assets-notice)
+
+---
+
+</div>
+
+## 📌 Overview
+
+**AI-Ops** is an intelligent Industrial IoT (IIoT) and factory operations management platform designed for smart manufacturing and Industry 4.0 environments. It bridges edge hardware (Arduino/Sensors) through WebSocket gateways to a high-performance Spring Boot backend and an immersive Three.js-powered digital twin front-end dashboard, complete with mobile field monitoring and real-time alert dispatching.
+
+---
+
+## ✨ Key Features
+
+- **🎮 3D Digital Twin Factory**: Interactive 3D SCADA/Digital Twin environment using Three.js / React Three Fiber (`@react-three/fiber` & `@react-three/drei`), supporting machine telemetry overlays and hand-gesture controls.
+- **⚡ Real-time Telemetry & Edge Gateway**: Multi-threaded edge gateway linking microcontrollers (Arduino firmware via PySerial) to cloud WebSocket endpoints (`ec2-cloud`) for live sensor streams.
+- **🛡️ Enterprise-Grade Backend**: Spring Boot 3 enterprise core featuring JWT authentication, role-based access control (RBAC), JPA/Hibernate entities, incident logging, machine telemetry, and predictive maintenance schedules.
+- **📊 Real-Time Operations Dashboard**: Responsive React 19 UI with Recharts analytics, incident lifecycles, inventory auditing, work order workflows, and live machine health monitors.
+- **📱 Mobile Companion & Alert Console**: Cross-platform Capacitor mobile app and dedicated alert simulation server for field technicians and shopfloor supervisors.
+- **🐳 Containerized Orchestration**: Complete multi-container setup via Docker & Docker Compose for seamless deployment across hybrid cloud environments.
+
+---
+
+## 🏛 System Architecture
+
+```mermaid
+flowchart TD
+    subgraph ShopFloor["🏭 Shop Floor & Edge Layer"]
+        A[Arduino Firmware & Sensors] -->|Serial COM / UART| B[Python Edge Gateway]
+    end
+
+    subgraph CloudRelay["☁️ Cloud & Message Relay"]
+        B -->|WebSocket Stream| C[EC2 / Cloud WebSocket Relay]
+    end
+
+    subgraph CoreBackend["⚙️ Backend Microservice"]
+        D[(Database / H2 / SQL)] <--> E[Spring Boot 3 Core API]
+        E -->|JWT Auth & REST API| F[Business Logic & Telemetry Engine]
+    end
+
+    subgraph Clients["🖥️ User Applications"]
+        F <--> G[React 19 Digital Twin Dashboard]
+        C -->|Live Telemetry| G
+        C -->|Live Push| H[Mobile App / Web Alert Console]
+    end
+```
+
+---
+
+## 📂 Project Structure
+
+```text
+AI-Ops/
+├── 3D-Models/                 # 3D GLB/GLTF assets for digital twin visualization
+├── ai-ops/                    # Frontend React 19 application (Three.js, Vite, Tailwind/CSS)
+│   ├── src/components/        # UI components & telemetry widgets
+│   ├── src/pages/             # Analytics, Machines, Incidents, Simulation, etc.
+│   └── src/simulation/        # FactoryScene, HandGestureController, AssetViewer
+├── aiops-backend/             # Spring Boot enterprise REST API
+│   ├── src/main/java/         # Controllers, Security (JWT), Models, Repositories
+│   └── src/main/resources/    # Configuration & database profiles
+├── ai-ops-mobile/             # Cross-platform mobile client (Capacitor / Android / Web)
+│   └── www/                   # Mobile alert web console & runtime
+├── edge-gateway/              # Python serial-to-websocket telemetry bridge
+├── ec2-cloud/                 # Standalone cloud WebSocket relay server
+├── arduino-firmware/          # Microcontroller firmware (.ino) for hardware sensors
+├── docker-compose.yml         # Multi-service container definitions
+├── start-all.bat              # One-click Windows CMD startup script
+└── start-all.ps1              # One-click PowerShell orchestrated launcher
+```
+
+---
+
+## 🚀 Quick Start
+
+### 1. Prerequisites
+- **Node.js**: v18+ & npm
+- **Java JDK**: 17+
+- **Maven**: 3.8+
+- **Python**: 3.9+ (with `pyserial`, `websockets`)
+- **Docker** & **Docker Compose** *(optional, for containerized run)*
+
+### 2. One-Click Launch (Windows)
+
+Launch all microservices simultaneously with a single command:
+
+```powershell
+# Using PowerShell:
+.\AI-Ops\start-all.ps1
+
+# Or using Windows Batch:
+.\AI-Ops\start-all.bat
+```
+
+### 3. Docker Compose Setup
+
+Run the full system inside containers:
+
+```bash
+cd AI-Ops
+docker compose up --build
+```
+
+---
+
+## 🌐 Services & Ports
+
+| Service | Port | Description |
+| :--- | :--- | :--- |
+| **React Web Dashboard** | `5173` | Main industrial dashboard & 3D Digital Twin |
+| **Spring Boot API** | `8080` | Core backend REST API & security services |
+| **Edge Gateway** | `8081` | Python WebSocket telemetry server |
+| **Mobile Web Sim** | `3000` | Shop-floor mobile interface preview |
+| **Alert Console** | `6000` | Critical alarms & alert dispatch terminal |
+
+---
+
+## 📦 3D Model Assets Notice
+
+> [!NOTE]
+> High-poly 3D models (`*.glb`, `*.gltf`) are excluded from this Git repository to keep repository size lean and prevent GitHub's 100MB file size limit issues.
+> 
+> If you are setting up local 3D Digital Twin simulations, place your `.glb` model files into:
+> - `AI-Ops/3D-Models/`
+> - `AI-Ops/ai-ops/public/3D-Models/`
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).

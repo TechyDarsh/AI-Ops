@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AI-Ops Mobile</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Loud SOS Horn Audio -->
+  <audio id="sos-horn" loop preload="auto">
+    <source src="https://actions.google.com/sounds/v1/alarms/spaceship_alarm.ogg" type="audio/ogg">
+  </audio>
+
+  <!-- Windows-Style Alert Modal -->
+  <div class="modal-overlay" id="win-error-modal">
+    <div class="win-dialog">
+      <div class="win-titlebar">
+        <span>⚠ Critical Hardware Alert</span>
+      </div>
+      <div class="win-body">
+        <div class="win-icon">⛔</div>
+        <div class="win-msg">
+          <h4>Immediate Action Required</h4>
+          <p>Critical threshold exceeded or sensor calibration fault detected on <strong>Machine 2 (M12)</strong>.</p>
+        </div>
+      </div>
+      <div class="win-footer">
+        <button class="win-btn primary" onclick="closeWinModal()">Acknowledge</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  
+  <!-- Sidebar Menu -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2>AI-Ops</h2>
+      <p>Industrial Companion</p>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="active">Live Telemetry</li>
+      <li>Machine Diagnostics</li>
+      <li>Alert History</li>
+      <li>Work Orders</li>
+      <li>Settings</li>
+      <li style="color: #ff3333; margin-top: 20px;">Emergency Stop</li>
+    </ul>
+  </nav>
+
+  <div class="app-container">
+    <header class="header">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="hamburger" id="menu-btn">&#9776;</div>
+        <div class="logo">AI-Ops Mobile</div>
+      </div>
+      <div id="conn-status" class="status-badge offline">OFFLINE</div>
+    </header>
+
+    <main class="content">
+      <div class="section-title">LIVE SENSOR TELEMETRY</div>
+      
+      <!-- MACHINE 1: DHT22 -->
+      <div class="card" id="card-mch001" onclick="toggleDetails('mch001')">
+        <div class="card-header">
+          <div>
+            <div class="mch-name">Thermal Monitoring Unit</div>
+            <div class="mch-id">MACHINE-001 &middot; DHT22</div>
+          </div>
+          <div class="mch-status" id="status-mch001">WAITING</div>
+        </div>
+        <div class="card-body">
+          <div class="data-box">
+            <div class="data-label">Temperature</div>
+            <div class="data-val" id="val-temp">-- &deg;C</div>
+          </div>
+          <div class="data-box">
+            <div class="data-label">Humidity</div>
+            <div class="data-val" id="val-hum">-- %</div>
+          </div>
+        </div>
+        <div class="card-details" id="details-mch001">
+          <p>Location: Production Floor A</p>
+          <p>Maintenance: Up to date</p>
+          <button class="action-btn">Run Diagnostics</button>
+        </div>
+      </div>
+
+      <!-- MACHINE 2: MQ-2 -->
+      <div class="card" id="card-mch002" onclick="toggleDetails('mch002')">
+        <div class="card-header">
+          <div>
+            <div class="mch-name">Gas Monitoring Unit A</div>
+            <div class="mch-id">MACHINE-002 &middot; MQ-2</div>
+          </div>
+          <div class="mch-status" id="status-mch002">WAITING</div>
+        </div>
+        <div class="card-body">
+          <div class="data-box">
+            <div class="data-label">MQ-2 Raw</div>
+            <div class="data-val" id="val-mq2-raw">--</div>
+          </div>
+          <div class="data-box">
+            <div class="data-label">Voltage</div>
+            <div class="data-val" id="val-mq2-volt">-- V</div>
+          </div>
+        </div>
+        <div class="card-details" id="details-mch002">
+          <p>Location: Chemical Storage B</p>
+          <p>Threshold: 130 Raw</p>
+          <button class="action-btn" id="btn-calibrate-mch002" onclick="handleCalibrate(event)">Calibrate Sensor</button>
+        </div>
+      </div>
+
+      <!-- MACHINE 3: MQ-9 -->
+      <div class="card" id="card-mch003" onclick="toggleDetails('mch003')">
+        <div class="card-header">
+          <div>
+            <div class="mch-name">Gas Monitoring Unit B</div>
+            <div class="mch-id">MACHINE-003 &middot; MQ-9</div>
+          </div>
+          <div class="mch-status" id="status-mch003">WAITING</div>
+        </div>
+        <div class="card-body">
+          <div class="data-box">
+            <div class="data-label">MQ-9 Raw</div>
+            <div class="data-val" id="val-mq9-raw">--</div>
+          </div>
+          <div class="data-box">
+            <div class="data-label">Voltage</div>
+            <div class="data-val" id="val-mq9-volt">-- V</div>
+          </div>
+        </div>
+        <div class="card-details" id="details-mch003">
+          <p>Location: Assembly Line C</p>
+          <p>Threshold: 600 Raw</p>
+          <button class="action-btn">Acknowledge</button>
+        </div>
+      </div>
+      
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

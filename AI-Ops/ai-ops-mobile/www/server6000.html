@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Ops Industrial Command Center | Port 6000 Alerts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #060913;
+      color: #e2e8f0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* Top Header Bar */
+    header {
+      background: #0d1527;
+      border-bottom: 1px solid #1e293b;
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #00aaff, #0066cc);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #fff;
+      font-size: 16px;
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+    .brand-subtitle {
+      font-size: 11px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #111c33;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid #1e293b;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ff3333;
+      box-shadow: 0 0 8px #ff3333;
+      transition: all 0.3s;
+    }
+    .status-dot.online {
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 24px;
+    }
+
+    .banner {
+      background: linear-gradient(90deg, #0e1e38 0%, #081120 100%);
+      border: 1px solid #1e3a66;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .banner h2 {
+      font-size: 20px;
+      color: #00aaff;
+      margin-bottom: 6px;
+    }
+    .banner p {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    /* Live Telemetry Cards */
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .card {
+      background: #0d1527;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .machine-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .machine-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #00aaff;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .badge-ok { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-crit { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.5); }
+
+    .telemetry-values {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      background: #080d19;
+      padding: 14px;
+      border-radius: 8px;
+    }
+    .val-box-label {
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .val-box-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    /* Real-time Alerts Log */
+    .log-panel {
+      background: #0d1527;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .log-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .log-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .log-entry {
+      background: #111c33;
+      padding: 12px 16px;
+      border-radius: 6px;
+      border-left: 4px solid #ef4444;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* =========================================
+       WINDOWS CRITICAL ERROR DIALOG (MODAL)
+       ========================================= */
+    .win-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      z-index: 999999;
+      justify-content: center;
+      align-items: center;
+    }
+    .win-overlay.active {
+      display: flex;
+    }
+    .win-modal {
+      width: 480px;
+      background: #1e1e1e;
+      border: 2px solid #ef4444;
+      border-radius: 8px;
+      box-shadow: 0 25px 50px -12px rgba(239, 68, 68, 0.4), 0 0 0 1px rgba(255,255,255,0.05);
+      overflow: hidden;
+      animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalPop {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .win-title {
+      background: #dc2626;
+      color: #fff;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.5px;
+    }
+    .win-content {
+      padding: 24px;
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      background: #18181b;
+    }
+    .win-stop-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #ef4444;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+    .win-message h3 {
+      font-size: 17px;
+      color: #f8fafc;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .win-message p {
+      font-size: 14px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+    .win-meta {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #27272a;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #f87171;
+    }
+    .win-actions {
+      background: #121214;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      border-top: 1px solid #27272a;
+    }
+    .win-action-btn {
+      padding: 8px 22px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .win-action-btn.cancel {
+      background: #27272a;
+      color: #a1a1aa;
+    }
+    .win-action-btn.confirm {
+      background: #dc2626;
+      color: #fff;
+    }
+    .win-action-btn.confirm:hover {
+      background: #b91c1c;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loud Alarm Audio Element -->
+  <audio id="siren-audio" loop preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-warning-alarm-buzzer-991.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- TOP HEADER -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">AI</div>
+      <div>
+        <div class="brand-title">AI-Ops Industrial Observatory</div>
+        <div class="brand-subtitle">Station Master Monitor &middot; Port 6000</div>
+      </div>
+    </div>
+    <div class="system-status">
+      <div class="status-dot" id="ws-indicator"></div>
+      <span id="ws-text">CONNECTING TO GATEWAY...</span>
+    </div>
+  </header>
+
+  <!-- MAIN BODY -->
+  <main>
+    <div class="banner">
+      <div>
+        <h2>System Dispatch Console</h2>
+        <p>Receiving real-time telemetry and wireless trigger events dispatched from mobile companion devices.</p>
+      </div>
+      <button onclick="testTriggerAlert()" style="background: #1e3a66; border: 1px solid #00aaff; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">
+        Simulate Test Alert
+      </button>
+    </div>
+
+    <!-- LIVE TELEMETRY CARDS -->
+    <div class="grid-cards">
+      <!-- MACHINE 001 -->
+      <div class="card" id="card-mch001">
+        <div class="card-top">
+          <div>
+            <div class="machine-title">Thermal Monitoring Unit</div>
+            <div class="machine-tag">MACHINE-001 &middot; DHT22</div>
+          </div>
+          <span class="badge badge-ok" id="badge-mch001">ONLINE</span>
+        </div>
+        <div class="telemetry-values">
+          <div>
+            <div class="val-box-label">Temperature</div>
+            <div class="val-box-num" id="temp-val">-- &deg;C</div>
+          </div>
+          <div>
+            <div class="val-box-label">Humidity</div>
+            <div class="val-box-num" id="hum-val">-- %</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MACHINE 002 -->
+      <div class="card" id="card-mch002">
+        <div class="card-top">
+          <div>
+            <div class="machine-title">Gas Monitoring Unit A</div>
+            <div class="machine-tag">MACHINE-002 (M12) &middot; MQ-2</div>
+          </div>
+          <span class="badge badge-ok" id="badge-mch002">NORMAL</span>
+        </div>
+        <div class="telemetry-values">
+          <div>
+            <div class="val-box-label">MQ-2 Raw</div>
+            <div class="val-box-num" id="mq2-raw-val">--</div>
+          </div>
+          <div>
+            <div class="val-box-label">Voltage</div>
+            <div class="val-box-num" id="mq2-volt-val">-- V</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MACHINE 003 -->
+      <div class="card" id="card-mch003">
+        <div class="card-top">
+          <div>
+            <div class="machine-title">Gas Monitoring Unit B</div>
+            <div class="machine-tag">MACHINE-003 &middot; MQ-9</div>
+          </div>
+          <span class="badge badge-ok" id="badge-mch003">NORMAL</span>
+        </div>
+        <div class="telemetry-values">
+          <div>
+            <div class="val-box-label">MQ-9 Raw</div>
+            <div class="val-box-num" id="mq9-raw-val">--</div>
+          </div>
+          <div>
+            <div class="val-box-label">Voltage</div>
+            <div class="val-box-num" id="mq9-volt-val">-- V</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALERTS LOG PANEL -->
+    <div class="log-panel">
+      <div class="log-header">
+        <span>Incident & Remote Event Stream</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">AUTO-SYNC ACTIVE</span>
+      </div>
+      <div class="log-list" id="alerts-log">
+        <div class="log-entry" style="border-left-color: #3b82f6;">
+          <div><strong>System Initialized:</strong> Awaiting mobile calibration signals or sensor threshold trips.</div>
+          <div style="color: #64748b; font-size: 11px;">READY</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==============================================
+       WINDOWS CRITICAL ERROR DIALOG BOX (POPUP)
+       ============================================== -->
+  <div class="win-overlay" id="winAlertModal">
+    <div class="win-modal">
+      <div class="win-title">
+        <span>⚠ WINDOWS HARDWARE FAULT DETECTED</span>
+      </div>
+      <div class="win-content">
+        <div class="win-stop-icon">✕</div>
+        <div class="win-message">
+          <h3>Immediate Action Required</h3>
+          <p id="winModalMessage">Immediate action required to Machine 2 (M12)!</p>
+          <div class="win-meta">
+            DISPATCH TARGET: MACHINE-002 [M12]<br>
+            TRIGGER: MOBILE CALIBRATE / THRESHOLD TRIP
+          </div>
+        </div>
+      </div>
+      <div class="win-actions">
+        <button class="win-action-btn cancel" onclick="dismissAlert()">Dismiss</button>
+        <button class="win-action-btn confirm" onclick="dismissAlert()">Acknowledge & Clear Alarm</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WS_URL = 'ws://localhost:8081';
+    let ws = null;
+    let alarmActive = false;
+    const siren = document.getElementById('siren-audio');
+
+    function connectGateway() {
+      const indicator = document.getElementById('ws-indicator');
+      const text = document.getElementById('ws-text');
+
+      ws = new WebSocket(WS_URL);
+
+      ws.onopen = () => {
+        indicator.className = 'status-dot online';
+        text.textContent = 'ONLINE (PORT 8081 LINKED)';
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          // 1. Check for Mobile Triggered Windows Alert
+          if (data.type === 'WINDOWS_ALERT') {
+            triggerWindowsDialog(data.message || 'Immediate action required to Machine 2 (M12)!');
+            return;
+          }
+
+          // 2. Handle Live Telemetry
+          if (data.dht22 && data.mq2 && data.mq9) {
+            updateDashboard(data);
+          }
+        } catch (e) {
+          console.error('Parse error:', e);
+        }
+      };
+
+      ws.onclose = () => {
+        indicator.className = 'status-dot';
+        text.textContent = 'GATEWAY DISCONNECTED (RETRYING...)';
+        setTimeout(connectGateway, 3000);
+      };
+    }
+
+    function updateDashboard(data) {
+      // DHT22
+      document.getElementById('temp-val').textContent = (data.dht22.temperature || 0).toFixed(1) + ' °C';
+      document.getElementById('hum-val').textContent = (data.dht22.humidity || 0).toFixed(1) + ' %';
+
+      // MQ-2
+      const raw2 = data.mq2.raw || 0;
+      document.getElementById('mq2-raw-val').textContent = raw2;
+      document.getElementById('mq2-volt-val').textContent = (data.mq2.voltage || 0).toFixed(2) + ' V';
+      
+      const badge2 = document.getElementById('badge-mch002');
+      if (raw2 >= 130) {
+        badge2.className = 'badge badge-crit';
+        badge2.textContent = 'CRITICAL';
+        if (!alarmActive) {
+          triggerWindowsDialog('MQ-2 Sensor threshold tripped (>= 130)! Immediate evacuation & check required on Machine 2 (M12).');
+        }
+      } else {
+        badge2.className = 'badge badge-ok';
+        badge2.textContent = 'NORMAL';
+      }
+
+      // MQ-9
+      const raw9 = data.mq9.raw || 0;
+      document.getElementById('mq9-raw-val').textContent = raw9;
+      document.getElementById('mq9-volt-val').textContent = (data.mq9.voltage || 0).toFixed(2) + ' V';
+    }
+
+    function triggerWindowsDialog(msg) {
+      document.getElementById('winModalMessage').textContent = msg;
+      document.getElementById('winAlertModal').classList.add('active');
+
+      // Add to Log list
+      const logList = document.getElementById('alerts-log');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `
+        <div><strong>CRITICAL ALERT:</strong> ${msg}</div>
+        <div style="color: #ef4444; font-size: 11px; font-family: monospace;">${new Date().toLocaleTimeString()}</div>
+      `;
+      logList.prepend(entry);
+
+      // Play Siren Buzzer
+      alarmActive = true;
+      if (siren) {
+        siren.currentTime = 0;
+        siren.play().catch(e => console.log('Audio autoplay prevented by browser interaction policy:', e));
+      }
+    }
+
+    function dismissAlert() {
+      document.getElementById('winAlertModal').classList.remove('active');
+      alarmActive = false;
+      if (siren) {
+        siren.pause();
+        siren.currentTime = 0;
+      }
+    }
+
+    function testTriggerAlert() {
+      triggerWindowsDialog('Manual test alert: Immediate action required to Machine 2 (M12)!');
+    }
+
+    // Connect immediately
+    connectGateway();
+  </script>
+</body>
+</html>

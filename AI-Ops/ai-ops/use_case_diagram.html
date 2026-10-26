@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Ops | Use Case Diagram</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            padding: 40px;
+            background-color: #f8fafc; /* Light gray-blue bg */
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 28px;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: #64748b;
+            max-width: 650px;
+            line-height: 1.6;
+            margin: 0 auto;
+            font-size: 15px;
+        }
+
+        .diagram-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            width: 100%;
+            max-width: 1300px;
+            position: relative;
+            gap: 60px;
+        }
+
+        /* SVG Overlay for exact line rendering */
+        #svg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1; /* Below actors/use-cases */
+        }
+
+        .connection {
+            fill: none;
+            stroke-width: 2px;
+            opacity: 0.6;
+            transition: stroke-width 0.2s, opacity 0.2s;
+        }
+
+        .conn-op { stroke: #0284c7; }
+        .conn-adm { stroke: #ea580c; }
+        .conn-eng { stroke: #059669; }
+
+        /* Actors */
+        .actor-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            width: 220px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .actor {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid;
+            border-radius: 8px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .actor.operator { border-top-color: #0284c7; }
+        .actor.admin { border-top-color: #ea580c; }
+        .actor.engineer { border-top-color: #059669; }
+
+        .actor-svg {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px auto;
+            display: block;
+        }
+        
+        .actor-svg circle, .actor-svg line, .actor-svg path {
+            stroke: #334155;
+            stroke-width: 1.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .actor-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: #0f172a;
+        }
+
+        .actor-desc {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        /* System Boundary */
+        .system-boundary {
+            flex: 1;
+            background: #ffffff;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px 30px;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        }
+
+        .system-title {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #f8fafc;
+            padding: 0 20px;
+            font-weight: 700;
+            font-size: 14px;
+            color: #334155;
+            letter-spacing: 0.5px;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+        }
+
+        .use-case-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .group-title {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .group-operator { color: #0284c7; }
+        .group-admin { color: #ea580c; }
+        .group-engineer { color: #059669; }
+
+        .use-case {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 12px 15px;
+            border-radius: 40px; /* Perfect oval */
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1e293b;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .use-case:hover {
+            transform: translateY(-2px);
+            background: #ffffff;
+            border-color: #94a3b8;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            z-index: 20;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>AI-Ops Platform Use Case Diagram</h1>
+        <p>A structural UML visualization mapping the three primary actor classes (Operator, Administrator, Engineer) to their respective operational responsibilities.</p>
+    </div>
+
+    <div class="diagram-container" id="diagram">
+        <!-- SVG Canvas perfectly mapped over the flex layout -->
+        <svg id="svg-canvas"></svg>
+
+        <!-- Left Actors (Operator & Admin) -->
+        <div class="actor-column">
+            <div class="actor operator" id="actor-op">
+                <svg class="actor-svg" viewBox="0 0 24 24">
+                    <circle cx="12" cy="7" r="4"/>
+                    <path d="M5.5 21v-2a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v2"/>
+                </svg>
+                <div class="actor-name">Factory Operator</div>
+                <div class="actor-desc">Monitoring, situational awareness, and real-time response.</div>
+            </div>
+
+            <div class="actor admin" id="actor-adm">
+                <svg class="actor-svg" viewBox="0 0 24 24">
+                    <circle cx="12" cy="7" r="4"/>
+                    <path d="M5.5 21v-2a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v2"/>
+                </svg>
+                <div class="actor-name">System Administrator</div>
+                <div class="actor-desc">Platform configuration and system health management.</div>
+            </div>
+        </div>
+
+        <!-- System Boundary (Use Cases) -->
+        <div class="system-boundary" id="system-box">
+            <div class="system-title">«System» AI-Ops Platform</div>
+
+            <!-- Operator Use Cases -->
+            <div class="use-case-group">
+                <div class="group-title group-operator">Operations</div>
+                <div class="use-case" id="uc-op-1">Login & Auth</div>
+                <div class="use-case" id="uc-op-2">View Command Center</div>
+                <div class="use-case" id="uc-op-3">Monitor Live Telemetry</div>
+                <div class="use-case" id="uc-op-4">View 3D Digital Twin</div>
+                <div class="use-case" id="uc-op-5">Acknowledge Alerts</div>
+                <div class="use-case" id="uc-op-6">Query AI Copilot</div>
+                <div class="use-case" id="uc-op-7">Review Health Scores</div>
+                <div class="use-case" id="uc-op-8">Track Robot Missions</div>
+                <div class="use-case" id="uc-op-9">Replay Event Timeline</div>
+                <div class="use-case" id="uc-op-10">Trigger Demo Scenarios</div>
+            </div>
+
+            <!-- Admin Use Cases -->
+            <div class="use-case-group">
+                <div class="group-title group-admin">Configuration & Admin</div>
+                <div class="use-case" id="uc-adm-1">Manage Users & Roles</div>
+                <div class="use-case" id="uc-adm-2">Configure Machine Registry</div>
+                <div class="use-case" id="uc-adm-3">Set Thresholds & Rules</div>
+                <div class="use-case" id="uc-adm-4">Upload Docs to KB</div>
+                <div class="use-case" id="uc-adm-5">Monitor System Health</div>
+                <div class="use-case" id="uc-adm-6">Configure ML Params</div>
+                <div class="use-case" id="uc-adm-7">Manage MQTT Broker</div>
+            </div>
+
+            <!-- Engineer Use Cases -->
+            <div class="use-case-group">
+                <div class="group-title group-engineer">Maintenance</div>
+                <div class="use-case" id="uc-eng-1">View Pending Work Orders</div>
+                <div class="use-case" id="uc-eng-2">Update WO Status</div>
+                <div class="use-case" id="uc-eng-3">Review AI Recommendations</div>
+                <div class="use-case" id="uc-eng-4">Access Manuals via RAG</div>
+                <div class="use-case" id="uc-eng-5">Log Maintenance Completion</div>
+                <div class="use-case" id="uc-eng-6">View Predictive Risk</div>
+                <div class="use-case" id="uc-eng-7">Request On-Demand Analysis</div>
+                <div class="use-case" id="uc-eng-8">Manage Spare Parts</div>
+            </div>
+        </div>
+
+        <!-- Right Actor (Engineer) -->
+        <div class="actor-column" style="justify-content: center;">
+            <div class="actor engineer" id="actor-eng">
+                <svg class="actor-svg" viewBox="0 0 24 24">
+                    <circle cx="12" cy="7" r="4"/>
+                    <path d="M5.5 21v-2a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v2"/>
+                </svg>
+                <div class="actor-name">Maintenance Engineer</div>
+                <div class="actor-desc">Diagnostics, predictive maintenance, and mechanical repairs.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script to strictly draw arrow lines -->
+    <script>
+        function renderLines() {
+            const svg = document.getElementById('svg-canvas');
+            const diagram = document.getElementById('diagram');
+            
+            // Set SVG size precisely to the container size
+            const dRect = diagram.getBoundingClientRect();
+            svg.style.width = dRect.width + 'px';
+            svg.style.height = dRect.height + 'px';
+
+            // Fresh SVG content (prevents DOM corruption)
+            let svgHTML = `
+                <defs>
+                    <marker id="arrow-op" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#0284c7" />
+                    </marker>
+                    <marker id="arrow-adm" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#ea580c" />
+                    </marker>
+                    <marker id="arrow-eng" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#059669" />
+                    </marker>
+                </defs>
+            `;
+
+            function getRightNode(id) {
+                const rect = document.getElementById(id).getBoundingClientRect();
+                return { x: rect.right - dRect.left, y: rect.top + (rect.height / 2) - dRect.top };
+            }
+            function getLeftNode(id) {
+                const rect = document.getElementById(id).getBoundingClientRect();
+                return { x: rect.left - dRect.left, y: rect.top + (rect.height / 2) - dRect.top };
+            }
+
+            function addCurve(start, end, colorClass, markerId) {
+                const cX = (start.x + end.x) / 2;
+                // Standard UML association curve
+                svgHTML += `<path d="M \${start.x} \${start.y} C \${cX} \${start.y}, \${cX} \${end.y}, \${end.x} \${end.y}" class="connection \${colorClass}" marker-end="url(#\${markerId})" />`;
+            }
+
+            // Factory Operator (Left -> Right)
+            for (let i=1; i<=10; i++) {
+                addCurve(getRightNode('actor-op'), getLeftNode('uc-op-'+i), 'conn-op', 'arrow-op');
+            }
+
+            // System Admin (Left -> Right)
+            for (let i=1; i<=7; i++) {
+                addCurve(getRightNode('actor-adm'), getLeftNode('uc-adm-'+i), 'conn-adm', 'arrow-adm');
+            }
+
+            // Maintenance Engineer (Right -> Left)
+            // Starts at Left edge of Engineer, points to Right edge of Use Case
+            for (let i=1; i<=8; i++) {
+                addCurve(getLeftNode('actor-eng'), getRightNode('uc-eng-'+i), 'conn-eng', 'arrow-eng');
+            }
+
+            svg.innerHTML = svgHTML;
+        }
+
+        // Wait a tiny bit for layout engine to stabilize fonts/paddings before drawing
+        window.addEventListener('load', () => setTimeout(renderLines, 100));
+        window.addEventListener('resize', renderLines);
+    </script>
+</body>
+</html>

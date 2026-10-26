@@ -1,0 +1,8 @@
+{
+  "appId": "com.aiops.mobile",
+  "appName": "AI-Ops Mobile",
+  "webDir": "www",
+  "server": {
+    "cleartext": true
+  }
+}
